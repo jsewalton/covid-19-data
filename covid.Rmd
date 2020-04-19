@@ -1,0 +1,41 @@
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(skimr)
+library(maps)
+
+covid <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/04-18-2020.csv")
+```
+
+```{r}
+data <- covid %>% 
+  select(Admin2, Province_State, Country_Region, Lat, Long_, Confirmed, Deaths) %>%
+  mutate(region = case_when(
+    is.na(Admin2) & is.na(Province_State) ~ Country_Region,
+    is.na(Admin2) & !is.na(Province_State) ~ paste(Province_State, Country_Region, sep = ", "),
+    !is.na(Admin2) & !is.na(Province_State) ~ paste(Admin2, Province_State, Country_Region, sep = ", ")
+  ))
+```
+```{r, warning = FALSE}
+
+Sys.setenv("MAPBOX_TOKEN" = 
+          "pk.eyJ1IjoiamVkd2FyZHMyMSIsImEiOiJjazhyamRoaDIwNmo5M2RtenNoNTBlOW9mIn0.RCk9CZZqefyJMNnH76LhaQ")
+
+data %>% 
+  plot_mapbox(lat = ~Lat, lon = ~Long_,
+              size = ~Confirmed,
+              text = ~paste(region, "\nConfirmed Cases:", Confirmed),
+              mode = 'scattermapbox') %>% 
+  layout(title = 'Worldwide COVID-19 Confirmed Cases: April 18, 2020',
+         font = list(color='white'),
+         plot_bgcolor = '#191A1A', paper_bgcolor = '#191A1A',
+         mapbox = list(style = 'dark'),
+         margin = list(l = 10, r = 10,
+                       b = 10, t = 50,
+                       pad = 2)) %>% 
+  config(mapboxAccessToken = Sys.getenv("MAPBOX_TOKEN"))
+```
