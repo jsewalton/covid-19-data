@@ -20,7 +20,7 @@ library(plotly)
 # https://github.com/CSSEGISandData/COVID-19. Load the most up-to-date data
 # by changing the date at the end of the file name.
 
-covid <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/04-18-2020.csv")
+covid <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/04-29-2020.csv")
 ```
 
 ```{r}
@@ -52,11 +52,12 @@ Sys.setenv("MAPBOX_TOKEN" =
 
 # Use the plot_mapbox command to initiate a plotly_mapbox object. The size of
 # circles on the map correspond to the number of confirmed cases in a region
-# with size = ~Confirmed, and the tooltips on the map show the latitude,
-# longitude, location name, and number of confirmed cases.
+# with size = ~Confirmed, and the tooltips on the map show the location name and
+# number of confirmed cases.
 
 data %>% 
   plot_mapbox(lat = ~Lat, lon = ~Long_,
+              hoverinfo = "text",
               size = ~Confirmed,
               text = ~paste(region, "\nConfirmed Cases:", Confirmed),
               mode = "scattermapbox") %>% 
@@ -64,7 +65,7 @@ data %>%
   # Use layout to change the design of the map. I changed the title, font,
   # background color, and margins.
   
-  layout(title = "Worldwide COVID-19 Confirmed Cases: April 18, 2020",
+  layout(title = "Worldwide COVID-19 Confirmed Cases: April 29, 2020",
          font = list(color = "white"),
          plot_bgcolor = "#191A1A", paper_bgcolor = "#191A1A",
          mapbox = list(style = "dark"),
